@@ -25,8 +25,52 @@ exports.register = async (req, res) => {
 
   res.status(201).json({
     message: "New Contact create successfully",
-    result,
+    data: result,
   });
+};
+
+exports.edit = async (req, res) => {
+  const { id } = req.params;
+
+  let contact = null;
+  if (isValidObjectId(id)) {
+    contact = await contactsModel.findOne({ _id: id });
+
+    if (!contact) {
+      return res.status(404).json({
+        message: "Contact Not Found!",
+      });
+    }
+  } else {
+    return res.status(422).json({
+      message: "ContactID is not valid!",
+    });
+  }
+
+  let { fullName, username, email, gender, city, phoneNumber, address, age } =
+    req.body;
+
+  const result = await contactsModel.updateOne(
+    { _id: id },
+    {
+      $set: {
+        fullName: fullName,
+        username: username,
+        email: email,
+        gender: gender,
+        city: city,
+        phoneNumber: phoneNumber,
+        address: address,
+        age: age,
+      },
+    }
+  );
+
+  res.status(200).json({
+    message: `Contact ${id} updated successfully`,
+    data: result,
+  });
+
 };
 
 exports.remove = async (req, res) => {
@@ -124,7 +168,7 @@ exports.find = async (req, res) => {
     });
   }
 
-  res.json({data: contacts});
+  res.json({ data: contacts });
 };
 
 function isNullOrEmpty(collection) {
@@ -146,7 +190,7 @@ async function findContacts(defaultArray, key, value) {
     case "fullName":
       if (isNullOrEmpty(contacts)) {
         contacts = await contactsModel.find({
-          fullName: { $regex: value, $options: 'i' },
+          fullName: { $regex: value, $options: "i" },
         });
         console.log(contacts);
       } else {

@@ -11,7 +11,7 @@ contactsRouter
 contactsRouter
   .route("/:id")
   .get(contactsController.getById)
-  // .put(contactsController.edit)
+  .put(contactsController.edit)
   .delete(contactsController.remove);
   
 contactsRouter
